@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { MapPin, Instagram, Flower2 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { IntroSplash } from "@/components/IntroSplash";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { SocialIcon } from "@/lib/social-icons";
 import logo from "@/assets/logo.png";
+
+const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4001';
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -27,17 +29,23 @@ function Index() {
   const { data: flowers = [], isLoading } = useQuery({
     queryKey: ["flowers-public"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("flowers")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as Flower[];
+      const res = await fetch(`${API_BASE}/api/flowers`);
+      if (!res.ok) throw new Error('Failed to load flowers');
+      return (await res.json()) as Flower[];
     },
   });
 
   const totalStock = flowers.reduce((s, f) => s + (f.is_available ? f.stock : 0), 0);
   const types = new Set(flowers.map((f) => f.type).filter(Boolean));
+
+  const { data: socialLinks = [] } = useQuery({
+    queryKey: ["social-links-public"],
+    queryFn: async () => {
+      const res = await fetch(`${API_BASE}/api/social-links`);
+      if (!res.ok) throw new Error('Failed to load social links');
+      return (await res.json()) as { id: string; name: string; platform: string; url: string }[];
+    },
+  });
 
   return (
     <>
@@ -72,14 +80,31 @@ function Index() {
                 <span>·</span>
                 <span>{totalStock} en stock</span>
               </div>
-              <a
-                href="https://instagram.com/flores.eternas.jovita"
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
-              >
-                <Instagram className="h-4 w-4" /> Síguenos en Instagram
-              </a>
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                {socialLinks.length > 0 ? (
+                  socialLinks.map((link) => (
+                    <a
+                      key={link.id}
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-4 py-2 text-sm font-medium text-foreground transition hover:border-primary hover:text-primary"
+                    >
+                      <SocialIcon platform={link.platform} className="h-4 w-4" />
+                      {link.name}
+                    </a>
+                  ))
+                ) : (
+                  <a
+                    href="https://instagram.com/flores.eternas.jovita"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"
+                  >
+                    <Instagram className="h-4 w-4" /> Síguenos en Instagram
+                  </a>
+                )}
+              </div>
             </div>
             <div className="flex justify-center md:justify-end">
               <div className="animate-petal-float relative">
@@ -145,7 +170,7 @@ function FlowerCard({ flower }: { flower: Flower }) {
       <div className="relative aspect-square overflow-hidden bg-muted">
         {flower.image_url ? (
           <img
-            src={flower.image_url}
+            src={flower.image_url.startsWith('/') ? `${API_BASE}${flower.image_url}` : flower.image_url}
             alt={flower.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
@@ -156,8 +181,10 @@ function FlowerCard({ flower }: { flower: Flower }) {
           </div>
         )}
         {soldOut && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-sm">
-            <Badge variant="destructive" className="text-sm">Agotado</Badge>
+          <div className="absolute inset-0 flex items-center justify-center bg-red-700/20 backdrop-blur-sm animate-pulse">
+            <div className="rounded-full border border-red-500/40 bg-red-600/15 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-red-700 shadow-lg shadow-red-500/10">
+              Agotado
+            </div>
           </div>
         )}
       </div>
