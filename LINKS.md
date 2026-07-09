@@ -2,8 +2,8 @@
 
 Este archivo contiene dos enlaces útiles para ver la aplicación y pasos rápidos para usarlos.
 
-- Enlace público (despliegue): https://your-deploy-url
-  - Qué hace: abre la versión publicada/hosted de la web.
+- Enlace público (despliegue): https://github.com/MarriGUB/flores-llanquihue-magia
+  - Qué hace: abre el repositorio en GitHub (no es la página desplegada).
   - Paso: abrir el navegador y pegar el enlace.
 
 - Enlace local (desarrollo): http://localhost:5173
@@ -15,4 +15,5 @@ Este archivo contiene dos enlaces útiles para ver la aplicación y pasos rápid
 
 Notas:
 - Ajusta el puerto si tu proyecto usa otro (por ejemplo `3000`).
-- Sustituye `https://your-deploy-url` por la URL real de despliegue cuando la tengas.
+- Sustituye la URL del repositorio por la URL de despliegue cuando la tengas.
+- Nota: la URL arriba es el repositorio en GitHub, no la URL de un sitio desplegado.
