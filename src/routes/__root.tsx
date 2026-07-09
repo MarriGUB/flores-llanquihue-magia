@@ -23,13 +23,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Flores eternas hechas a mano con amor y cariño en Llanquihue. Ramos, arreglos y detalles únicos por Jovita.",
       },
-      { property: "og:title", content: "Flores Eternas Jovita" },
+      { property: "og:title", content: "Flores Eternas Jovita — Flores artesanales en Llanquihue" },
       {
         property: "og:description",
-        content: "Flores artesanales eternas, hechas a mano en Llanquihue.",
+        content: "Flores eternas hechas a mano con amor y cariño en Llanquihue. Ramos, arreglos y detalles únicos por Jovita.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Flores Eternas Jovita — Flores artesanales en Llanquihue" },
+      { name: "twitter:description", content: "Flores eternas hechas a mano con amor y cariño en Llanquihue. Ramos, arreglos y detalles únicos por Jovita." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cb749c88-b439-4046-baa3-a6206fe57229/id-preview-bb3e27ae--aa46c513-2864-42f4-844e-704e904b6300.lovable.app-1783576031667.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cb749c88-b439-4046-baa3-a6206fe57229/id-preview-bb3e27ae--aa46c513-2864-42f4-844e-704e904b6300.lovable.app-1783576031667.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
