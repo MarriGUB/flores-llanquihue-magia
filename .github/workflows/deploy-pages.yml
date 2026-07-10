@@ -28,12 +28,12 @@ jobs:
 
       - name: Add SPA 404 fallback
         run: |
-          if [ -d dist ]; then cp dist/index.html dist/404.html || true; fi
+          if [ -d dist/client ]; then cp dist/client/index.html dist/client/404.html || true; fi
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1
         with:
-          path: ./dist
+          path: ./dist/client
 
   deploy:
     needs: build_and_deploy

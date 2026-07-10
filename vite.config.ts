@@ -12,6 +12,7 @@ export default defineConfig({
     // nitro/vite builds from this
     server: { entry: "server" },
   },
+  nitro: false,
   vite: {
     base: '/flores-llanquihue-magia/',
   },
