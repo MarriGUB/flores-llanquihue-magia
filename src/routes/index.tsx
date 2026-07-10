@@ -5,47 +5,24 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { IntroSplash } from "@/components/IntroSplash";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { catalogAssetUrl, fetchPublishedCatalog, type CatalogFlower } from "@/lib/catalog";
 import { SocialIcon } from "@/lib/social-icons";
 import logo from "@/assets/logo.png";
-
-const API_BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:4001';
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
-type Flower = {
-  id: string;
-  name: string;
-  type: string | null;
-  description: string | null;
-  price: number;
-  stock: number;
-  image_url: string | null;
-  is_available: boolean;
-};
-
 function Index() {
-  const { data: flowers = [], isLoading } = useQuery({
-    queryKey: ["flowers-public"],
-    queryFn: async () => {
-      const res = await fetch(`${API_BASE}/api/flowers`);
-      if (!res.ok) throw new Error('Failed to load flowers');
-      return (await res.json()) as Flower[];
-    },
+  const { data: catalog, isLoading } = useQuery({
+    queryKey: ["published-catalog"],
+    queryFn: fetchPublishedCatalog,
   });
+  const flowers = catalog?.flowers ?? [];
+  const socialLinks = catalog?.socialLinks ?? [];
 
   const totalStock = flowers.reduce((s, f) => s + (f.is_available ? f.stock : 0), 0);
   const types = new Set(flowers.map((f) => f.type).filter(Boolean));
-
-  const { data: socialLinks = [] } = useQuery({
-    queryKey: ["social-links-public"],
-    queryFn: async () => {
-      const res = await fetch(`${API_BASE}/api/social-links`);
-      if (!res.ok) throw new Error('Failed to load social links');
-      return (await res.json()) as { id: string; name: string; platform: string; url: string }[];
-    },
-  });
 
   return (
     <>
@@ -64,11 +41,13 @@ function Index() {
                 <MapPin className="mr-1 h-3 w-3" /> Llanquihue, Chile
               </Badge>
               <h1 className="font-display text-4xl leading-tight text-primary sm:text-5xl md:text-6xl">
-                Flores eternas,<br />hechas con amor
+                Flores eternas,
+                <br />
+                hechas con amor
               </h1>
               <p className="mt-5 max-w-md text-base text-muted-foreground sm:text-lg">
-                Ramos y arreglos artesanales que duran para siempre. Cada pétalo
-                trabajado a mano por Jovita, con dedicación y ternura.
+                Ramos y arreglos artesanales que duran para siempre. Cada pétalo trabajado a mano
+                por Jovita, con dedicación y ternura.
               </p>
               <div className="mt-6 flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1.5">
@@ -163,14 +142,15 @@ function Index() {
   );
 }
 
-function FlowerCard({ flower }: { flower: Flower }) {
+function FlowerCard({ flower }: { flower: CatalogFlower }) {
   const soldOut = !flower.is_available || flower.stock <= 0;
+  const imageUrl = catalogAssetUrl(flower.image_url);
   return (
     <Card className="group overflow-hidden border-border/70 shadow-[var(--shadow-soft)] transition-transform hover:-translate-y-1">
       <div className="relative aspect-square overflow-hidden bg-muted">
-        {flower.image_url ? (
+        {imageUrl ? (
           <img
-            src={flower.image_url.startsWith('/') ? `${API_BASE}${flower.image_url}` : flower.image_url}
+            src={imageUrl}
             alt={flower.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
